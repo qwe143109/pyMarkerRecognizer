@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 ADAPTIVE_THRESH_SIZE = 35
 APPROX_POLY_EPS = 0.08
@@ -11,8 +12,8 @@ class Marker:
     m_id = 0
     m_corners = np.array([])
     # c0------c3
-    # |          |
-    # |          |
+    # |		  |
+    # |		  |
     # c1------c2
 
     def __init__(self):
@@ -212,9 +213,13 @@ class MarkerRecognizer:
     def drawToImage(self, image, color, thickness):
         for i in range(0, len(self.__m_markers)):
             self.__m_markers[i].drawToImage(image, color, thickness)
-    
+
     def getMarkersCenter(self):
-        loc = {}
+        locs = {}
         for m_marker in self.__m_markers:
-            loc[m_marker.m_id] = ( m_marker.m_corners[0] + m_marker.m_corners[1] + m_marker.m_corners[2] + m_marker.m_corners[3] ) / 4.0
-        return loc
+            dic = {}
+            dic['pt'] = ( m_marker.m_corners[0] + m_marker.m_corners[1] + m_marker.m_corners[2] + m_marker.m_corners[3] ) / 4.0
+            vec = m_marker.m_corners[3] - m_marker.m_corners[0]
+            dic['angle'] = math.atan2(vec[1], vec[0]) / math.pi * 180
+            locs[m_marker.m_id] = dic
+        return locs
